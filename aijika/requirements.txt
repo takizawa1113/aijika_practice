@@ -1,0 +1,5 @@
+streamlit>=1.40
+pandas>=2.0
+msal>=1.28
+requests>=2.31
+icalendar>=6.0
