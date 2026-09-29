@@ -12,6 +12,7 @@ import free_time_repository
 import matching
 import request_repository
 import sidebar
+import vacation_widget
 
 
 def render(employee):
@@ -82,5 +83,11 @@ def render(employee):
                 )
         else:
             st.info("この余白時間に合う支援業務は見つかりませんでした。午後休・自己研鑽などの活用も検討できます。")
+            vacation_widget.render_compact(
+                employee,
+                target_date,
+                matching.parse_time(latest["start_time"]),
+                matching.parse_time(latest["end_time"]),
+            )
     else:
         st.info("まだ余白時間が登録されていません。")
