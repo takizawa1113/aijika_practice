@@ -37,7 +37,9 @@ if "employee_id" not in st.session_state:
     st.session_state.employee_id = 1
 
 if "selected_page" not in st.session_state:
-    st.session_state.selected_page = "ホーム"
+    # ブラウザの再読み込みでもURLのクエリパラメータ（?page=...）から
+    # 直前の画面を復元できるようにする。
+    st.session_state.selected_page = st.query_params.get("page", "ホーム")
 
 employee = employee_repository.get_employee(st.session_state.employee_id)
 

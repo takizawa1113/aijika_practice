@@ -30,7 +30,12 @@ def render_sidebar(employee):
     if pending in names:
         st.session_state["menu_radio"] = labels[names.index(pending)]
     elif "menu_radio" not in st.session_state:
-        default_name = st.session_state.get("selected_page", names[0])
+        # ブラウザの再読み込みでsession_stateが失われても、
+        # URLのクエリパラメータ（?page=...）から直前の画面を復元する。
+        default_name = st.session_state.get(
+            "selected_page",
+            st.query_params.get("page", names[0]),
+        )
         default_index = names.index(default_name) if default_name in names else 0
         st.session_state["menu_radio"] = labels[default_index]
 
@@ -47,6 +52,7 @@ def render_sidebar(employee):
         )
         page = names[labels.index(choice)]
         st.session_state.selected_page = page
+        st.query_params["page"] = page
 
         st.divider()
         st.caption(f"ログイン中：{employee['name']}")
