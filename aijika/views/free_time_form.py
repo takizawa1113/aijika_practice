@@ -13,6 +13,7 @@ import calendar_widget
 import free_time_repository
 import matching
 import request_repository
+import vacation_widget
 from config import PREFERENCE_OPTIONS, SKILL_OPTIONS
 
 
@@ -68,6 +69,8 @@ def render(employee):
     # 注意: st.button() は st.form() の中では使えない（st.form_submit_button のみ許可）ため、
     # フォーム送信後の表示・操作はフォームブロックの外側で行う。
     if submitted:
+        # 新しく登録し直したら、前回の休暇おすすめは一旦消す
+        st.session_state.pop("vacation_context", None)
         if end <= start:
             st.error("終了時刻は開始時刻より後にしてください。")
         elif matching.hours_between(start, end) < 1:
@@ -118,3 +121,27 @@ def render(employee):
                     "👉 午後休　👉 自己研鑽　👉 レジャー\n\n"
                     "など、別の余白活用方法を検討してみましょう。"
                 )
+                # 休暇のおすすめ用に入力内容を保存しておく。
+                # ダウンロードボタン等を押すと再実行されて submitted が False に
+                # 戻るため、表示は if submitted: の外側で行う。
+                st.session_state["vacation_context"] = {
+                    "free_date": free_date,
+                    "start": start,
+                    "end": end,
+                    "preferences": preference,
+                }
+
+    # ============================================================
+    # 休暇のおすすめ（マッチなしのときだけ。担当: vacation_widget.py）
+    # ============================================================
+    ctx = st.session_state.get("vacation_context")
+    if ctx:
+        st.divider()
+        vacation_widget.render_vacation_suggestions(
+            employee,
+            ctx["free_date"],
+            ctx["start"],
+            ctx["end"],
+            ctx["preferences"],
+            request_repository.get_requests(),
+        )
