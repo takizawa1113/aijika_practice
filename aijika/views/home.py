@@ -29,31 +29,47 @@ def render(employee):
 
     b1, b2 = st.columns(2)
     with b1:
-        st.info("🕐 **空いている時間を登録**\n\n日時・時間・スキルを登録すると、あなたに合う候補を探します。")
-        if st.button("余白時間を登録する", type="primary", use_container_width=True):
+        if st.button(
+            "🕐 **空いている時間を登録**  \n日時・時間・スキルを登録すると、あなたに合う候補を探します。",
+            type="primary",
+            use_container_width=True,
+            key="home_card_free_time",
+        ):
             sidebar.navigate_to("余白時間を登録")
             st.rerun()
 
     with b2:
-        st.success("🔍 **支援を探す**\n\n他部署の支援依頼から、あなたのスキルに合う仕事を探します。")
-        if st.button("支援を探す", use_container_width=True):
+        if st.button(
+            "🔍 **支援を探す**  \n他部署の支援依頼から、あなたのスキルに合う仕事を探します。",
+            use_container_width=True,
+            key="home_card_search",
+        ):
             sidebar.navigate_to("支援を探す")
             st.rerun()
 
     st.write("")
     st.subheader("🆕 新着の支援依頼")
+
     requests_df = request_repository.get_requests()
     if requests_df.empty:
         st.info("現在、支援依頼はありません。")
     else:
-        display_df = requests_df.head(5).copy()
-        display_df["希望日時"] = display_df["request_date"] + " " + display_df["start_time"] + "～" + display_df["end_time"]
-        display_df["必要スキル"] = display_df["skills"]
-        display_df = display_df[
-            ["department", "title", "希望日時", "required_hours", "people_needed", "必要スキル"]
-        ]
-        display_df.columns = ["部署", "業務内容", "希望日時", "所要時間(h)", "人数", "必要スキル"]
-        st.dataframe(display_df, use_container_width=True, hide_index=True)
+        for _, r in requests_df.head(5).iterrows():
+            with st.container(border=True):
+                left, right = st.columns([4, 1])
+                with left:
+                    st.markdown(f"**{r['title']}**　({r['department']})")
+                    st.caption(
+                        f"📅 {r['request_date']}　"
+                        f"🕐 {r['start_time']}～{r['end_time']}　"
+                        f"👥 {r['people_needed']}名　"
+                        f"🛠 {r['skills']}"
+                    )
+                with right:
+                    if st.button("詳細", key=f"home_detail_{r['id']}", use_container_width=True):
+                        st.session_state["jump_to_request_id"] = r["id"]
+                        sidebar.navigate_to("支援を探す")
+                        st.rerun()
 
     st.subheader("💡 あなたへのおすすめ")
     st.caption("まず余白時間を登録すると、マッチングスコアを計算できます。")
