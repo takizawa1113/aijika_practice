@@ -4,8 +4,6 @@
 他部署の支援依頼を日付・スキル・部署で絞り込んで一覧表示する。
 """
 
-from datetime import date, timedelta
-
 import streamlit as st
 
 import request_repository
@@ -17,9 +15,14 @@ def render(employee):
 
     df = request_repository.get_requests()
 
+    # ホームの「詳細」ボタンから来た場合、その案件の詳細を自動で開く。
+    jump_id = st.session_state.pop("jump_to_request_id", None)
+    if jump_id is not None:
+        st.session_state[f"show_request_{jump_id}"] = True
+
     c1, c2, c3 = st.columns(3)
     with c1:
-        target_date = st.date_input("希望日", value=date.today() + timedelta(days=1))
+        target_date = st.date_input("希望日（未指定で全期間から検索）", value=None)
     with c2:
         skill_filter = st.text_input("スキルで絞り込み", placeholder="例：Excel")
     with c3:
@@ -29,7 +32,8 @@ def render(employee):
         )
 
     filtered = df[df["status"] == "募集中"].copy()
-    filtered = filtered[filtered["request_date"] == target_date.isoformat()]
+    if target_date:
+        filtered = filtered[filtered["request_date"] == target_date.isoformat()]
 
     if dept_filter != "すべて":
         filtered = filtered[filtered["department"] == dept_filter]
@@ -38,6 +42,10 @@ def render(employee):
         filtered = filtered[
             filtered["skills"].str.contains(skill_filter, case=False, na=False)
         ]
+
+    # ホームからジャンプしてきた場合は、絞り込み条件を無視してその案件だけを表示する。
+    if jump_id is not None:
+        filtered = df[df["id"] == jump_id]
 
     if filtered.empty:
         st.warning("条件に一致する支援依頼はありません。")
