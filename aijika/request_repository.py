@@ -15,7 +15,7 @@ def get_requests():
     conn = get_conn()
     df = pd.read_sql_query(
         """
-        SELECT id, department, title, description, request_date,
+        SELECT id, employee_id, department, title, description, request_date,
                start_time, end_time, required_hours, people_needed,
                skills, status
         FROM support_requests
@@ -27,7 +27,30 @@ def get_requests():
     return df
 
 
+def get_my_requests(employee_id):
+    """指定した社員が登録した支援依頼だけ取得する。"""
+
+    conn = get_conn()
+
+    df = pd.read_sql_query(
+        """
+        SELECT id, employee_id, department, title, description, request_date,
+               start_time, end_time, required_hours, people_needed,
+               skills, status
+        FROM support_requests
+        WHERE employee_id = ?
+        ORDER BY request_date, start_time
+        """,
+        conn,
+        params=(employee_id,),
+    )
+
+    conn.close()
+    return df
+
+
 def insert_request(
+    employee_id,
     department,
     title,
     description,
@@ -43,11 +66,12 @@ def insert_request(
     conn.execute(
         """
         INSERT INTO support_requests
-        (department,title,description,request_date,start_time,end_time,
+        (employee_id,department,title,description,request_date,start_time,end_time,
          required_hours,people_needed,skills,status)
-        VALUES (?,?,?,?,?,?,?,?,?,?)
+        VALUES (?,?,?,?,?,?,?,?,?,?,?)
         """,
         (
+            employee_id,
             department,
             title,
             description,
@@ -62,3 +86,76 @@ def insert_request(
     )
     conn.commit()
     conn.close()
+
+
+def update_request(
+    request_id,
+    employee_id,
+    department,
+    title,
+    description,
+    request_date,
+    start_time,
+    end_time,
+    required_hours,
+    people_needed,
+    skills,
+):
+    """指定した社員が登録した支援依頼だけ更新する。"""
+
+    conn = get_conn()
+
+    cur = conn.execute(
+        """
+        UPDATE support_requests
+        SET department = ?,
+            title = ?,
+            description = ?,
+            request_date = ?,
+            start_time = ?,
+            end_time = ?,
+            required_hours = ?,
+            people_needed = ?,
+            skills = ?
+        WHERE id = ?
+          AND employee_id = ?
+        """,
+        (
+            department,
+            title,
+            description,
+            request_date,
+            start_time,
+            end_time,
+            required_hours,
+            people_needed,
+            skills,
+            request_id,
+            employee_id,
+        ),
+    )
+
+    conn.commit()
+    conn.close()
+
+    return cur.rowcount > 0
+
+
+def delete_request(request_id, employee_id):
+    """指定した社員が登録した支援依頼だけ削除する。"""
+
+    conn = get_conn()
+
+    cur = conn.execute(
+        """
+        DELETE FROM support_requests
+        WHERE id = ?
+          AND employee_id = ?
+        """,
+        (request_id, employee_id),
+    )
+
+    conn.commit()
+    conn.close()
+
+    return cur.rowcount > 0
