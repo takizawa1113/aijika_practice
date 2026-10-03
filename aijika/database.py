@@ -36,6 +36,7 @@ def init_db():
         """
         CREATE TABLE IF NOT EXISTS support_requests (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
+            employee_id INTEGER,
             department TEXT NOT NULL,
             title TEXT NOT NULL,
             description TEXT,
@@ -49,6 +50,33 @@ def init_db():
         )
         """
     )
+    # 既存DBにemployee_id列がなければ追加する
+    columns = [
+        row[1]
+        for row in cur.execute(
+            "PRAGMA table_info(support_requests)"
+        ).fetchall()
+    ]
+
+    if "employee_id" not in columns:
+        cur.execute(
+            "ALTER TABLE support_requests ADD COLUMN employee_id INTEGER"
+        )
+
+        # 既存の5件に登録者を設定
+        cur.execute(
+            """
+            UPDATE support_requests
+            SET employee_id = CASE id
+                WHEN 1 THEN 1
+                WHEN 2 THEN 1
+                WHEN 3 THEN 2
+                WHEN 4 THEN 3
+                WHEN 5 THEN 4
+            END
+            WHERE id IN (1, 2, 3, 4, 5)
+            """
+        )
 
     cur.execute(
         """
@@ -110,6 +138,7 @@ def _seed_requests(cur):
     base = date.today()
     requests = [
         (
+            1,  # employee_id
             "営業部",
             "営業部のデータチェック",
             "営業リストのデータ確認・整形をお願いします。",
@@ -122,6 +151,7 @@ def _seed_requests(cur):
             "募集中",
         ),
         (
+            1,  # employee_id
             "企画部",
             "社内向け資料の作成補助",
             "新サービスの社内向け説明資料の作成補助です。",
@@ -134,6 +164,7 @@ def _seed_requests(cur):
             "募集中",
         ),
         (
+            2,  # employee_id
             "経理部",
             "データ集計（Excel）",
             "月次データの集計・チェックをお願いします。",
@@ -146,6 +177,7 @@ def _seed_requests(cur):
             "募集中",
         ),
         (
+            3,  # employee_id
             "システム部",
             "FAQ更新作業",
             "社内FAQの内容確認と更新作業です。",
@@ -158,6 +190,7 @@ def _seed_requests(cur):
             "募集中",
         ),
         (
+            4,  # employee_id
             "人事部",
             "アンケート集計",
             "社員アンケートの集計をお願いします。",
@@ -170,12 +203,13 @@ def _seed_requests(cur):
             "募集中",
         ),
     ]
+
     cur.executemany(
         """
         INSERT INTO support_requests
-        (department,title,description,request_date,start_time,end_time,
-         required_hours,people_needed,skills,status)
-        VALUES (?,?,?,?,?,?,?,?,?,?)
+        (employee_id,department,title,description,request_date,start_time,end_time,
+        required_hours,people_needed,skills,status)
+        VALUES (?,?,?,?,?,?,?,?,?,?,?)
         """,
         requests,
     )

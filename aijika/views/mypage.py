@@ -10,6 +10,16 @@ import employee_repository
 import free_time_repository
 from config import SKILL_OPTIONS
 
+@st.dialog("削除確認")
+def confirm_delete(id):
+    st.write("本当に削除しますか？")
+
+    if st.button("はい"):
+        free_time_repository.delete_free_time(id)
+        st.rerun()
+
+    if st.button("キャンセル"):
+        st.rerun()
 
 def render(employee):
     # ============================================================
@@ -183,6 +193,7 @@ def render(employee):
     else:
         view = free_df[
             [
+                "id",
                 "free_date",
                 "start_time",
                 "end_time",
@@ -191,16 +202,46 @@ def render(employee):
             ]
         ].copy()
 
-        view.columns = [
-            "日付",
-            "開始",
-            "終了",
-            "スキル",
-            "希望",
-        ]
+        # ヘッダー
+        b1, b2, b3, b4, b5, b6 = st.columns(6)
 
-        st.dataframe(
-            view,
-            use_container_width=True,
-            hide_index=True,
-        )
+        with b1:
+            st.markdown("**日付**")
+
+        with b2:
+            st.markdown("**開始**")
+
+        with b3:
+            st.markdown("**終了**")
+
+        with b4:
+            st.markdown("**スキル**")
+
+        with b5:
+            st.markdown("**希望**")
+
+        with b6:
+            st.markdown("**操作**")
+
+        # データ
+        for _, b in view.iterrows():
+            b1, b2, b3, b4, b5, b6 = st.columns(6)
+
+            with b1:
+                st.write(b["free_date"])
+
+            with b2:
+                st.write(b["start_time"])
+
+            with b3:
+                st.write(b["end_time"])
+
+            with b4:
+                st.write(b["skills"])
+
+            with b5:
+                st.write(b["preference"])
+
+            with b6:
+                if st.button("削除", key=b["id"]):
+                    confirm_delete(b["id"])

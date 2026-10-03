@@ -40,6 +40,7 @@ def render(employee):
                 st.error("終了時刻は開始時刻より後にしてください。")
             else:
                 request_repository.insert_request(
+                    employee_id=employee["id"],  # ← 追加
                     department=department,
                     title=title,
                     description=description,
