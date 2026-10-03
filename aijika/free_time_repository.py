@@ -37,3 +37,14 @@ def insert_free_time(employee_id, free_date, start_time, end_time, skills, prefe
     )
     conn.commit()
     conn.close()
+
+def delete_free_time(id):
+    conn = get_conn()
+    conn.execute(
+        """
+            DELETE FROM free_times
+            where id = ?
+        """,(id,)
+    )
+    conn.commit()
+    conn.close()
