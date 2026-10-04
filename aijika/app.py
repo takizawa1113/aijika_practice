@@ -14,7 +14,7 @@ import database
 import employee_repository
 import sidebar
 import styles
-from views import calendar_view, free_time_form, home, mypage, notices, request_form, search
+from views import free_time_form, home, mypage, request_form, search
 
 # ============================================================
 # 基本設定
@@ -68,9 +68,7 @@ PAGE_RENDERERS = {
     "支援を探す": search.render,
     "支援を依頼する": request_form.render,
     "余白時間を登録": free_time_form.render,
-    "カレンダー": calendar_view.render,
     "マイページ": mypage.render,
-    "お知らせ": notices.render,
 }
 
 render_page = PAGE_RENDERERS.get(page, home.render)
