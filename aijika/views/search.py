@@ -155,6 +155,14 @@ def delete_request_dialog(request_id, employee_id):
                 st.error("削除できませんでした。")
 
 
+def clear_focus():
+    st.session_state.pop("focus_request_id", None)
+
+
+def toggle_detail(detail_key):
+    st.session_state[detail_key] = not st.session_state.get(detail_key, False)
+
+
 def render(employee):
     st.header("🔍 支援を探す")
 
@@ -168,6 +176,7 @@ def render(employee):
         "表示",
         ["支援を探す", "自分が登録した支援"],
         horizontal=True,
+        on_change=clear_focus,
     )
 
     if mode == "支援を探す":
@@ -179,19 +188,28 @@ def render(employee):
 
 
     # ホームの「詳細」ボタンから来た場合、その案件の詳細を自動で開く。
-    jump_id = st.session_state.pop("jump_to_request_id", None)
-    if jump_id is not None:
+    if "jump_to_request_id" in st.session_state:
+        jump_id = st.session_state.pop("jump_to_request_id")
+        for key in [k for k in st.session_state if k.startswith("show_request_")]:
+            st.session_state[key] = False
+        st.session_state["focus_request_id"] = jump_id
         st.session_state[f"show_request_{jump_id}"] = True
+    focus_id = st.session_state.get("focus_request_id")
 
     c1, c2, c3 = st.columns(3)
     with c1:
-        target_date = st.date_input("希望日（未指定で全期間から検索）", value=None)
+        target_date = st.date_input(
+            "希望日（未指定で全期間から検索）", value=None, on_change=clear_focus
+        )
     with c2:
-        skill_filter = st.text_input("スキルで絞り込み", placeholder="例：Excel")
+        skill_filter = st.text_input(
+            "スキルで絞り込み", placeholder="例：Excel", on_change=clear_focus
+        )
     with c3:
         dept_filter = st.selectbox(
             "部署",
             ["すべて"] + sorted(df["department"].unique().tolist()),
+            on_change=clear_focus,
         )
 
     filtered = df[df["status"] == "募集中"].copy()
@@ -206,14 +224,18 @@ def render(employee):
             filtered["skills"].str.contains(skill_filter, case=False, na=False)
         ]
 
-    # ホームからジャンプしてきた場合は、絞り込み条件を無視してその案件だけを表示する。
-    if jump_id is not None:
-        filtered = df[df["id"] == jump_id]
+    # ホームから選んだ案件は、全件の中で一番上に表示する。
+    if focus_id is not None and focus_id in filtered["id"].values:
+        filtered = filtered.assign(_focus=filtered["id"] == focus_id).sort_values(
+            "_focus", ascending=False, kind="stable"
+        )
 
     if filtered.empty:
         st.warning("条件に一致する支援依頼はありません。")
     else:
         for _, r in filtered.iterrows():
+            if focus_id is not None and r["id"] == focus_id:
+                st.markdown("📌 **ホームで選んだ支援依頼**")
             with st.container(border=True):
                 left, right = st.columns([4, 1])
                 with left:
@@ -229,12 +251,15 @@ def render(employee):
 
 
                 with right:
-                    if st.button(
-                        "詳細を見る",
+                    detail_key = f"show_request_{r['id']}"
+                    is_open = st.session_state.get(detail_key, False)
+                    st.button(
+                        "詳細を隠す" if is_open else "詳細を見る",
                         key=f"detail_{r['id']}",
-                        use_container_width=True
-                    ):
-                        st.session_state[f"show_request_{r['id']}"] = True
+                        use_container_width=True,
+                        on_click=toggle_detail,
+                        args=(detail_key,),
+                    )
 
 
                     if mode == "自分が登録した支援":
