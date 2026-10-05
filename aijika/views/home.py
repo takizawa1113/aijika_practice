@@ -8,6 +8,7 @@ from datetime import date
 
 import streamlit as st
 
+import config
 import free_time_repository
 import matching
 import request_repository
@@ -16,16 +17,20 @@ import vacation_widget
 
 
 def render(employee):
-    st.markdown(
-        """
-        <div class="hero">
-            <h1>空いてる時間、どうする？</h1>
-            <p>仕事を手伝う。休む。学ぶ。楽しむ。<br>
-            あなたの余白に、最適な選択肢を。</p>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
+    hero_text, hero_image = st.columns([4, 1], vertical_alignment="center")
+    with hero_text:
+        st.markdown(
+            """
+            <div class="hero">
+                <h1>空いてる時間、どうする？</h1>
+                <p>仕事を手伝う。休む。学ぶ。楽しむ。<br>
+                あなたの余白に、最適な選択肢を。</p>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+    with hero_image:
+        st.image(config.DEER_IMAGE_PATH, use_container_width=True)
 
     b1, b2 = st.columns(2)
     with b1:

@@ -13,7 +13,8 @@ from pathlib import Path
 # ページ全体設定（st.set_page_config用）
 # ------------------------------------------------------------
 PAGE_TITLE = "アイジカ"
-PAGE_ICON = str(Path(__file__).parent / "assets" / "aijika_deer.png")
+DEER_IMAGE_PATH = str(Path(__file__).parent / "assets" / "aijika_deer.png")
+PAGE_ICON = DEER_IMAGE_PATH
 LAYOUT = "wide"
 INITIAL_SIDEBAR_STATE = "expanded"
 
