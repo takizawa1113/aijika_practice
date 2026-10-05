@@ -12,13 +12,14 @@ from pathlib import Path
 # ------------------------------------------------------------
 # ページ全体設定（st.set_page_config用）
 # ------------------------------------------------------------
-PAGE_TITLE = "空いてる時間、どうする？"
-PAGE_ICON = "💡"
+PAGE_TITLE = "アイジカ"
+PAGE_ICON = str(Path(__file__).parent / "assets" / "aijika_deer.png")
 LAYOUT = "wide"
 INITIAL_SIDEBAR_STATE = "expanded"
 
-APP_NAME = "空いてる時間、どうする？"
-APP_TAGLINE = "～なんとかなれーッ！社内リソース・マッチング～"
+APP_NAME = "アイジカ"
+APP_TAGLINE = "あなたの余白に、選択肢を。"
+LOGO_PATH = str(Path(__file__).parent / "assets" / "aijika_logo.png")
 
 # ------------------------------------------------------------
 # DB

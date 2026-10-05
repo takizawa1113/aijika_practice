@@ -51,7 +51,7 @@ page = sidebar.render_sidebar(employee)
 
 col1, col2 = st.columns([5, 1])
 with col1:
-    st.markdown(f'<div class="main-title">{config.APP_NAME}</div>', unsafe_allow_html=True)
+    st.image(config.LOGO_PATH, width=200)
     st.markdown(f'<div class="sub-title">{config.APP_TAGLINE}</div>', unsafe_allow_html=True)
 with col2:
     st.write("")

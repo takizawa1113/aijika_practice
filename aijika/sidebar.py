@@ -6,7 +6,7 @@
 
 import streamlit as st
 
-from config import APP_NAME, APP_TAGLINE, PAGES
+from config import APP_TAGLINE, LOGO_PATH, PAGES
 
 
 def navigate_to(page_name):
@@ -40,7 +40,7 @@ def render_sidebar(employee):
         st.session_state["menu_radio"] = labels[default_index]
 
     with st.sidebar:
-        st.markdown(f"## 💡 {APP_NAME}")
+        st.image(LOGO_PATH, width=160)
         st.caption(APP_TAGLINE)
         st.divider()
 
