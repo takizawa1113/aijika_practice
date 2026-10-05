@@ -9,6 +9,9 @@ import streamlit as st
 
 CUSTOM_CSS = """
 <style>
+.block-container {
+    padding-top: 4.5rem;
+}
 .main-title {
     font-size: 2.1rem;
     font-weight: 700;

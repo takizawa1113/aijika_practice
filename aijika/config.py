@@ -20,6 +20,7 @@ LAYOUT = "wide"
 INITIAL_SIDEBAR_STATE = "expanded"
 
 APP_NAME = "アイジカ"
+HEADER_TITLE = "空いてる時間、どうする？"
 APP_TAGLINE = "あなたの余白に、選択肢を。"
 LOGO_PATH = str(Path(__file__).parent / "assets" / "aijika_logo.png")
 LOGO_LINK = "?page=" + quote("ホーム")

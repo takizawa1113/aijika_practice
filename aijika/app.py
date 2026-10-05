@@ -51,8 +51,9 @@ page = sidebar.render_sidebar(employee)
 
 col1, col2 = st.columns([5, 1])
 with col1:
-    st.markdown(sidebar.logo_html(), unsafe_allow_html=True)
-    st.markdown(f'<div class="sub-title">{config.APP_TAGLINE}</div>', unsafe_allow_html=True)
+    if page != "ホーム":
+        st.markdown(f'<div class="main-title">{config.HEADER_TITLE}</div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="sub-title">{config.APP_TAGLINE}</div>', unsafe_allow_html=True)
 with col2:
     st.write("")
     st.button("ログアウト", disabled=True, use_container_width=True)
