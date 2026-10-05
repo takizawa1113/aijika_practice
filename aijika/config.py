@@ -8,6 +8,7 @@ DB接続やビジネスロジックは持たない。
 
 from datetime import time
 from pathlib import Path
+from urllib.parse import quote
 
 # ------------------------------------------------------------
 # ページ全体設定（st.set_page_config用）
@@ -21,6 +22,7 @@ INITIAL_SIDEBAR_STATE = "expanded"
 APP_NAME = "アイジカ"
 APP_TAGLINE = "あなたの余白に、選択肢を。"
 LOGO_PATH = str(Path(__file__).parent / "assets" / "aijika_logo.png")
+LOGO_LINK = "?page=" + quote("ホーム")
 
 # ------------------------------------------------------------
 # DB
