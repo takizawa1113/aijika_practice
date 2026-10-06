@@ -6,7 +6,18 @@
 
 import streamlit as st
 
-from config import APP_NAME, APP_TAGLINE, PAGES
+import base64
+
+from config import APP_TAGLINE, LOGO_LINK, LOGO_PATH, PAGES
+
+
+def logo_html():
+    with open(LOGO_PATH, "rb") as f:
+        encoded = base64.b64encode(f.read()).decode()
+    return (
+        f'<a href="{LOGO_LINK}" target="_self">'
+        f'<img src="data:image/png;base64,{encoded}" width="200" alt="アイジカ"></a>'
+    )
 
 
 def navigate_to(page_name):
@@ -40,7 +51,7 @@ def render_sidebar(employee):
         st.session_state["menu_radio"] = labels[default_index]
 
     with st.sidebar:
-        st.markdown(f"## 💡 {APP_NAME}")
+        st.markdown(logo_html(), unsafe_allow_html=True)
         st.caption(APP_TAGLINE)
         st.divider()
 
