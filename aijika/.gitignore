@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.pyc
+venv/
+.venv/
+
+# Streamlitの秘密情報（クライアントIDなど）。絶対にコミットしないこと。
+.streamlit/secrets.toml
+
+# Outlook連携のログインキャッシュ（個人の認証情報が入るため）
+outlook_token_cache.bin
+
+# DB（アプリ起動時に自動生成される。各自のローカルデータなので共有しない）
+resource_matching.db
+
+# VS Codeワークスペース設定（個人用）
+*.code-workspace
+
+# OS
+.DS_Store
