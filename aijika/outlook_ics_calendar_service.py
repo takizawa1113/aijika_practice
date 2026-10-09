@@ -43,6 +43,7 @@ pip install icalendar
 """
 
 from datetime import datetime
+from zoneinfo import ZoneInfo
 
 import requests
 import streamlit as st
@@ -55,6 +56,9 @@ except ImportError:
 ICS_URL_SECRET_KEY = "OUTLOOK_ICS_URL"
 _UPLOAD_SESSION_KEY = "_outlook_ics_bytes"
 
+# Streamlit Cloud のサーバーは UTC で動くため、「このPCの時刻」ではなく
+# 日本時間に明示的に変換する（変換しないと 9:00 の予定が 0:00 になる）
+JST = ZoneInfo("Asia/Tokyo")
 
 def _get_ics_url():
     try:
@@ -114,12 +118,12 @@ def _parse_ics_bytes(ics_bytes, target_date):
         # 備えて、失敗したらtzinfoを外してそのまま使う（デモを止めないため）。
         if dtstart.tzinfo is not None:
             try:
-                dtstart = dtstart.astimezone().replace(tzinfo=None)
+                dtstart = dtstart.astimezone(JST).replace(tzinfo=None)
             except Exception:
                 dtstart = dtstart.replace(tzinfo=None)
         if dtend.tzinfo is not None:
             try:
-                dtend = dtend.astimezone().replace(tzinfo=None)
+                dtend = dtend.astimezone(JST).replace(tzinfo=None)
             except Exception:
                 dtend = dtend.replace(tzinfo=None)
 
