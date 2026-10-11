@@ -37,6 +37,10 @@ def calculate_score(employee_skills, free_start, free_end, req):
     overlap_end = min(fe, re_)
     overlap_hours = hours_between(overlap_start, overlap_end)
 
+    # 時間が1分も重ならない依頼は、手伝えないのでおすすめしない
+    if overlap_hours == 0:
+        return 0
+
     if overlap_hours >= req["required_hours"]:
         score += 50
     elif overlap_hours >= 2:
@@ -90,7 +94,13 @@ def make_recommendations(employee, free_date, free_start, free_end, requests_df)
             reason = []
             if matched_skills:
                 reason.append("スキルが一致")
-            if score >= 50:
+            
+             # 「時間帯が適合」は、重なりが所要時間以上あるときだけ表示する
+            overlap = hours_between(
+                max(parse_time(free_start), parse_time(req["start_time"])),
+                min(parse_time(free_end), parse_time(req["end_time"])),
+            )
+            if overlap >= req["required_hours"]:
                 reason.append("時間帯が適合")
             if not reason:
                 reason.append("条件が比較的近い")
